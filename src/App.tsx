@@ -92,8 +92,16 @@ function App() {
     setViewMode('auto')
   }
 
-  // Sort by AI suspect ratio descending, then apply filters
-  const sorted = [...results].sort((a, b) => b.suspectRatio - a.suspectRatio)
+  // Sort by 整篇 AI 可能性（主要信號）, then 標記比率（次要）, so holistically-AI
+  // essays surface to the top even when few individual sentences were flagged.
+  const likelihoodRank: Record<string, number> = { HIGH: 2, MEDIUM: 1, LOW: 0 }
+  const sorted = [...results].sort((a, b) => {
+    const diff =
+      likelihoodRank[a.verdict?.aiLikelihood ?? 'LOW'] -
+      likelihoodRank[b.verdict?.aiLikelihood ?? 'LOW']
+    if (diff !== 0) return -diff
+    return b.suspectRatio - a.suspectRatio
+  })
   const filtered = sorted
     .filter((r) => r.suspectRatio >= ratioMin)
     .filter(

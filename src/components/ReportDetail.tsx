@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { AnalysisResult, SentenceResult } from '../types'
 import { HighlightedText } from './HighlightedText'
+import { verdictMeta } from './StudentReport'
 
 function FocusView({ sentences }: { sentences: SentenceResult[] }) {
   const suspects = sentences.filter((s) => s.status === 'AI_SUSPECT')
@@ -25,6 +26,21 @@ export function ReportDetail({ result }: { result: AnalysisResult }) {
 
   return (
     <div>
+      {/* 整篇總評 — 補足逐句判定漏掉的整體訊號 */}
+      {result.verdict && (
+        <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+          <div className="flex items-center gap-2">
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${verdictMeta(result.verdict.aiLikelihood).cls}`}
+            >
+              {verdictMeta(result.verdict.aiLikelihood).label}
+            </span>
+            <span className="text-xs font-medium text-gray-500">整篇總評</span>
+          </div>
+          <p className="mt-1.5 text-sm leading-relaxed text-gray-600">{result.verdict.summary}</p>
+        </div>
+      )}
+
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs text-gray-500">
           共 {result.totalCount} 句 ｜ 紅色 {result.aiSuspectCount} 句 ｜ 藍色{' '}

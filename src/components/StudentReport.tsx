@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { AnalysisResult } from '../types'
+import type { AiLikelihood, AnalysisResult } from '../types'
 import { ReportDetail } from './ReportDetail'
 import { StudentAnnotation } from './StudentAnnotation'
 
@@ -12,6 +12,18 @@ export function ratioBadgeClass(ratio: number) {
   if (ratio >= 0.4) return 'bg-red-100 text-red-700'
   if (ratio >= 0.2) return 'bg-amber-100 text-amber-700'
   return 'bg-gray-100 text-gray-500'
+}
+
+/** 整篇 AI 可能性徽章的文案與配色（新的主要信號） */
+export function verdictMeta(likelihood: AiLikelihood) {
+  switch (likelihood) {
+    case 'HIGH':
+      return { label: 'AI 可能性高', short: '高', cls: 'bg-red-100 text-red-700' }
+    case 'MEDIUM':
+      return { label: 'AI 可能性中', short: '中', cls: 'bg-amber-100 text-amber-700' }
+    default:
+      return { label: 'AI 可能性低', short: '低', cls: 'bg-gray-100 text-gray-500' }
+  }
 }
 
 export function StudentReport({ result, index = 0 }: Props) {
@@ -27,12 +39,19 @@ export function StudentReport({ result, index = 0 }: Props) {
         className="flex cursor-pointer items-center justify-between px-5 py-4 transition-colors duration-150 hover:bg-gray-50"
         onClick={() => setExpanded((v) => !v)}
       >
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2">
           <span className="truncate text-sm font-semibold text-gray-800">{result.filename}</span>
+          {result.verdict && (
+            <span
+              className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${verdictMeta(result.verdict.aiLikelihood).cls}`}
+            >
+              {verdictMeta(result.verdict.aiLikelihood).label}
+            </span>
+          )}
           <span
-            className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${ratioBadgeClass(result.suspectRatio)}`}
+            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ratioBadgeClass(result.suspectRatio)}`}
           >
-            AI {(result.suspectRatio * 100).toFixed(1)}%
+            標記 {(result.suspectRatio * 100).toFixed(0)}%
           </span>
         </div>
         <span

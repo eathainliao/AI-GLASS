@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { AnalysisResult } from '../types'
-import { ratioBadgeClass } from './StudentReport'
+import { ratioBadgeClass, verdictMeta } from './StudentReport'
 import { ReportDetail } from './ReportDetail'
 import { StatusButtons, NoteInput } from './StudentAnnotation'
 
@@ -23,11 +23,20 @@ export function StudentTable({ results }: Props) {
                 className="flex cursor-pointer items-center gap-3 px-4 py-2.5 transition-colors duration-150 hover:bg-gray-50"
                 onClick={() => setOpenFile(open ? null : r.filename)}
               >
-                <span className="w-40 shrink-0 truncate text-sm font-medium text-gray-800">
+                <span className="w-36 shrink-0 truncate text-sm font-medium text-gray-800">
                   {r.filename}
                 </span>
+                {r.verdict && (
+                  <span
+                    className={`w-9 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-semibold ${verdictMeta(r.verdict.aiLikelihood).cls}`}
+                    title={verdictMeta(r.verdict.aiLikelihood).label}
+                  >
+                    {verdictMeta(r.verdict.aiLikelihood).short}
+                  </span>
+                )}
                 <span
-                  className={`w-16 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-medium ${ratioBadgeClass(r.suspectRatio)}`}
+                  className={`w-14 shrink-0 rounded-full px-2 py-0.5 text-center text-xs font-medium ${ratioBadgeClass(r.suspectRatio)}`}
+                  title="逐句標記比率"
                 >
                   {(r.suspectRatio * 100).toFixed(0)}%
                 </span>

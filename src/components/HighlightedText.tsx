@@ -23,9 +23,7 @@ export function HighlightedText({ sentences }: Props) {
         // AI_SUSPECT — custom tooltip replaces native title attribute
         return (
           <span key={i} className="relative inline-block group">
-            <span className="rounded px-0.5 bg-red-100 text-red-800 cursor-help">
-              {s.text}
-            </span>
+            <span className="rounded px-0.5 bg-red-100 text-red-800 cursor-help">{s.text}</span>
             {s.reason && (
               <span className="pointer-events-none absolute bottom-full left-0 z-10 mb-1.5 w-max max-w-[220px] origin-bottom-left scale-95 translate-y-1 rounded-lg bg-gray-900 px-2.5 py-1.5 text-xs leading-snug text-white opacity-0 transition ease-out duration-150 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
                 {s.reason}

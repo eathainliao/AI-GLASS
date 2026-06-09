@@ -2,7 +2,7 @@ import { useAnalysisStore } from '../store/analysisStore'
 import { parseFile } from '../lib/parsers'
 import { analyzeImage, analyzeText, type AnalyzeResult } from '../lib/gemini/client'
 import { createRateLimiter } from '../lib/concurrency/rateLimiter'
-import type { AnalysisResult, SentenceResult } from '../types'
+import type { AnalysisResult, DocumentVerdict, SentenceResult } from '../types'
 
 const limiter = createRateLimiter(10) // shared across invocations
 
@@ -14,11 +14,16 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 type Parsed = Awaited<ReturnType<typeof parseFile>>
 
-function buildResult(filename: string, sentences: SentenceResult[]): AnalysisResult {
+function buildResult(
+  filename: string,
+  verdict: DocumentVerdict,
+  sentences: SentenceResult[]
+): AnalysisResult {
   const aiSuspectCount = sentences.filter((s) => s.status === 'AI_SUSPECT').length
   const safeQuoteCount = sentences.filter((s) => s.status === 'SAFE_QUOTE').length
   return {
     filename,
+    verdict,
     sentences,
     aiSuspectCount,
     safeQuoteCount,
@@ -53,7 +58,7 @@ export function useBatchAnalyzer() {
           const parsed = await parseFile(file)
           const res = await analyzeWithRetry(apiKey, parsed)
           if (res.ok) {
-            addResult(buildResult(file.name, res.sentences))
+            addResult(buildResult(file.name, res.verdict, res.sentences))
           } else {
             addError(file.name, res.message)
           }

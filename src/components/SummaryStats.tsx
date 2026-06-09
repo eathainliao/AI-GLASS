@@ -10,9 +10,13 @@ export function SummaryStats({ results }: Props) {
   const total = results.length
   if (total === 0) return null
 
-  // Risk distribution
-  const high = results.filter((r) => r.suspectRatio >= 0.4).length
-  const mid = results.filter((r) => r.suspectRatio >= 0.2 && r.suspectRatio < 0.4).length
+  // Risk distribution — 以整篇總評為準（補足逐句判定漏掉的整體訊號）；
+  // 缺 verdict 的舊資料退回以標記比率粗分。
+  const likelihoodOf = (r: AnalysisResult) =>
+    r.verdict?.aiLikelihood ??
+    (r.suspectRatio >= 0.4 ? 'HIGH' : r.suspectRatio >= 0.2 ? 'MEDIUM' : 'LOW')
+  const high = results.filter((r) => likelihoodOf(r) === 'HIGH').length
+  const mid = results.filter((r) => likelihoodOf(r) === 'MEDIUM').length
   const low = total - high - mid
 
   // Teacher judgment tallies
@@ -25,10 +29,10 @@ export function SummaryStats({ results }: Props) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm">
       <p className="text-gray-700">
-        本批 <strong>{total}</strong> 份 ｜{' '}
-        <span className="text-red-600">高疑慮(≥40%) {high}</span> ｜{' '}
-        <span className="text-amber-600">中(20–40%) {mid}</span> ｜{' '}
-        <span className="text-gray-500">低(&lt;20%) {low}</span>
+        本批 <strong>{total}</strong> 份 ｜ AI 可能性{' '}
+        <span className="text-red-600">高 {high}</span> ｜{' '}
+        <span className="text-amber-600">中 {mid}</span> ｜{' '}
+        <span className="text-gray-500">低 {low}</span>
       </p>
       <p className="mt-1.5 text-gray-700">
         教師標記 ｜ <span className="text-red-600">疑似AI {tally.ai}</span> ｜{' '}

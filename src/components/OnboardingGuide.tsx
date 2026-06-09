@@ -1,6 +1,20 @@
 const STEPS = [
-  { n: 1, text: <span>前往 <strong>Google AI Studio</strong>（aistudio.google.com）</span> },
-  { n: 2, text: <span>點擊左側選單 <strong>Get API key</strong> → 建立新金鑰（完全免費）</span> },
+  {
+    n: 1,
+    text: (
+      <span>
+        前往 <strong>Google AI Studio</strong>（aistudio.google.com）
+      </span>
+    ),
+  },
+  {
+    n: 2,
+    text: (
+      <span>
+        點擊左側選單 <strong>Get API key</strong> → 建立新金鑰（完全免費）
+      </span>
+    ),
+  },
   { n: 3, text: <span>複製金鑰，貼入下方輸入框即可開始使用</span> },
 ]
 

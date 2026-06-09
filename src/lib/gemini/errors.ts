@@ -43,8 +43,7 @@ export function formatGeminiError(status: number, rawBody: string): string {
 
   if (status === 429) {
     const details = err?.details ?? []
-    const quotaId =
-      details.find((d) => d.violations?.length)?.violations?.[0]?.quotaId ?? ''
+    const quotaId = details.find((d) => d.violations?.length)?.violations?.[0]?.quotaId ?? ''
     const retrySec = parseRetrySeconds(
       details.find((d) => (d['@type'] ?? '').includes('RetryInfo'))?.retryDelay
     )

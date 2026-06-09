@@ -22,9 +22,7 @@ export function PrintReport({ results }: Props) {
       {/* Report header */}
       <div className="mb-4 border-b-2 border-gray-800 pb-2">
         <h1 className="text-lg font-bold">AI 作業鑑識報告</h1>
-        <p className="mt-1 text-sm">
-          日期：{today} ｜ 班級：____________ ｜ 教師：____________
-        </p>
+        <p className="mt-1 text-sm">日期：{today} ｜ 班級：____________ ｜ 教師：____________</p>
         <p className="text-sm">本批列印 {results.length} 份</p>
       </div>
 
@@ -37,8 +35,25 @@ export function PrintReport({ results }: Props) {
             <div key={r.filename} className="print-student border border-gray-300 p-3">
               <div className="flex items-baseline justify-between">
                 <span className="font-semibold">{r.filename}</span>
-                <span className="text-sm">AI 疑慮 {(r.suspectRatio * 100).toFixed(1)}%</span>
+                <span className="text-sm">
+                  {r.verdict && (
+                    <strong>
+                      整篇 AI 可能性：
+                      {r.verdict.aiLikelihood === 'HIGH'
+                        ? '高'
+                        : r.verdict.aiLikelihood === 'MEDIUM'
+                          ? '中'
+                          : '低'}
+                    </strong>
+                  )}
+                  <span className="ml-2 text-gray-600">
+                    標記 {(r.suspectRatio * 100).toFixed(0)}%
+                  </span>
+                </span>
               </div>
+              {r.verdict?.summary && (
+                <p className="mt-1 text-sm text-gray-700">{r.verdict.summary}</p>
+              )}
               <p className="mt-1 text-sm">
                 教師判定：<strong>{STATUS_LABEL[ann.status]}</strong>
                 {ann.note && <span> ｜ 備註：{ann.note}</span>}

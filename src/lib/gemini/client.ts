@@ -1,5 +1,5 @@
 import type { GeminiRequest, PingResult } from './types'
-import type { SentenceResult } from '../../types'
+import type { DocumentVerdict, SentenceResult } from '../../types'
 import { ANALYSIS_SYSTEM_PROMPT, IMAGE_OCR_PREFIX } from './prompts'
 import { ANALYSIS_RESPONSE_SCHEMA } from './schema'
 import { formatGeminiError } from './errors'
@@ -33,7 +33,12 @@ export async function pingGemini(apiKey: string): Promise<PingResult> {
   } catch (err) {
     return { ok: false, status: 0, message: String(err) }
   }
-  if (!res.ok) return { ok: false, status: res.status, message: formatGeminiError(res.status, await res.text()) }
+  if (!res.ok)
+    return {
+      ok: false,
+      status: res.status,
+      message: formatGeminiError(res.status, await res.text()),
+    }
   const data = await res.json()
   const reply: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '(no reply)'
   return { ok: true, reply }
@@ -42,7 +47,7 @@ export async function pingGemini(apiKey: string): Promise<PingResult> {
 // ── Analysis ─────────────────────────────────────────────────────────────────
 
 export type AnalyzeResult =
-  | { ok: true; sentences: SentenceResult[] }
+  | { ok: true; verdict: DocumentVerdict; sentences: SentenceResult[] }
   | { ok: false; status: number; message: string }
 
 /** Analyze a plain-text assignment */
@@ -91,14 +96,27 @@ async function callAnalysis(url: string, body: GeminiRequest): Promise<AnalyzeRe
     return { ok: false, status: 0, message: String(err) }
   }
   if (!res.ok)
-    return { ok: false, status: res.status, message: formatGeminiError(res.status, await res.text()) }
+    return {
+      ok: false,
+      status: res.status,
+      message: formatGeminiError(res.status, await res.text()),
+    }
 
   const data = await res.json()
-  const raw: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '[]'
+  const raw: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}'
 
   try {
-    const sentences = JSON.parse(raw) as SentenceResult[]
-    return { ok: true, sentences }
+    const parsed = JSON.parse(raw) as {
+      verdict?: DocumentVerdict
+      sentences?: SentenceResult[]
+    }
+    const sentences = parsed.sentences ?? []
+    // 防禦：模型偶爾漏 verdict 時，退回以逐句結果粗估，不讓整批失敗
+    const verdict: DocumentVerdict = parsed.verdict ?? {
+      aiLikelihood: 'LOW',
+      summary: '（未提供整篇總評）',
+    }
+    return { ok: true, verdict, sentences }
   } catch {
     return { ok: false, status: 200, message: `JSON parse failed: ${raw.slice(0, 200)}` }
   }
