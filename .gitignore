@@ -28,3 +28,6 @@ dist-ssr
 
 # Test documents (student work / personal data)
 testdoc/
+
+# 開發階段紀錄（內部流水帳，不公開）
+docs/history/
