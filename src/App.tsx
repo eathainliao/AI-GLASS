@@ -3,6 +3,7 @@ import { useApiKey } from './hooks/useApiKey'
 import { useBatchAnalyzer } from './hooks/useBatchAnalyzer'
 import { useAnalysisStore } from './store/analysisStore'
 import { useAnnotationStore, type AnnotationStatus } from './store/annotationStore'
+import { AppIntro } from './components/AppIntro'
 import { OnboardingGuide } from './components/OnboardingGuide'
 import { ApiKeyInput } from './components/ApiKeyInput'
 import { FileDropzone } from './components/FileDropzone'
@@ -125,7 +126,8 @@ function App() {
 
       <main className="mx-auto max-w-3xl space-y-6 px-6 py-8">
         {!apiKey && (
-          <div className="print:hidden">
+          <div className="space-y-6 print:hidden">
+            <AppIntro />
             <OnboardingGuide />
           </div>
         )}
