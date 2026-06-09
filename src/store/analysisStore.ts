@@ -7,7 +7,11 @@ interface AnalysisStore {
   progress: { completed: number; total: number }
   results: AnalysisResult[]
   errors: Record<string, string>
-  startBatch: (total: number) => void
+  /** 本批次的原始檔案，供「重試失敗項」使用（不持久化，重整後遺失） */
+  files: File[]
+  startBatch: (files: File[]) => void
+  /** 重跑失敗項：保留既有 results，清空 errors，進度接續既有成功數 */
+  startRetry: (failedCount: number) => void
   addResult: (result: AnalysisResult) => void
   addError: (filename: string, message: string) => void
   finishBatch: () => void
@@ -21,9 +25,26 @@ export const useAnalysisStore = create<AnalysisStore>()(
       progress: { completed: 0, total: 0 },
       results: [],
       errors: {},
+      files: [],
 
-      startBatch: (total) =>
-        set({ status: 'analyzing', progress: { completed: 0, total }, results: [], errors: {} }),
+      startBatch: (files) =>
+        set({
+          status: 'analyzing',
+          progress: { completed: 0, total: files.length },
+          results: [],
+          errors: {},
+          files,
+        }),
+
+      startRetry: (failedCount) =>
+        set((s) => ({
+          status: 'analyzing',
+          errors: {},
+          progress: {
+            completed: s.results.length,
+            total: s.results.length + failedCount,
+          },
+        })),
 
       addResult: (result) =>
         set((s) => ({
@@ -40,7 +61,13 @@ export const useAnalysisStore = create<AnalysisStore>()(
       finishBatch: () => set({ status: 'done' }),
 
       reset: () =>
-        set({ status: 'idle', progress: { completed: 0, total: 0 }, results: [], errors: {} }),
+        set({
+          status: 'idle',
+          progress: { completed: 0, total: 0 },
+          results: [],
+          errors: {},
+          files: [],
+        }),
     }),
     {
       name: 'ai-glass:analysis',
@@ -55,6 +82,7 @@ export const useAnalysisStore = create<AnalysisStore>()(
           ...current,
           results: p.results,
           errors: p.errors,
+          files: [], // File 物件無法序列化，重整後遺失 → 隱藏重試鈕
           status: (hasData ? 'done' : 'idle') as BatchStatus,
           progress: hasData ? { completed: total, total } : { completed: 0, total: 0 },
         }

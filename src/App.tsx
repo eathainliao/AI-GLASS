@@ -67,8 +67,8 @@ const RATIO_OPTIONS = [
 
 function App() {
   const { apiKey, loading: keyLoading, save, saveSession, clear } = useApiKey()
-  const { analyze } = useBatchAnalyzer()
-  const { status, progress, results, errors, reset: resetAnalysis } = useAnalysisStore()
+  const { analyze, retryFailed } = useBatchAnalyzer()
+  const { status, progress, results, errors, files, reset: resetAnalysis } = useAnalysisStore()
   const { annotations, reset: resetAnnotations } = useAnnotationStore()
 
   const [viewMode, setViewMode] = useState<'auto' | 'table' | 'cards'>('auto')
@@ -265,9 +265,19 @@ function App() {
 
                   {Object.keys(errors).length > 0 && (
                     <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-                      <p className="mb-2 text-sm font-medium text-red-700">
-                        {Object.keys(errors).length} 份分析失敗
-                      </p>
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-red-700">
+                          {Object.keys(errors).length} 份分析失敗
+                        </p>
+                        {apiKey && files.length > 0 && (
+                          <button
+                            onClick={() => retryFailed(apiKey)}
+                            className="shrink-0 rounded-lg border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-700 transition ease-out duration-150 hover:bg-red-100 active:scale-[0.97]"
+                          >
+                            重試失敗的 {Object.keys(errors).length} 份
+                          </button>
+                        )}
+                      </div>
                       <ul className="space-y-1 text-xs text-red-600">
                         {Object.entries(errors).map(([name, msg]) => (
                           <li key={name}>
