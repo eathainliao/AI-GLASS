@@ -1,6 +1,18 @@
 # AI-GLASS — 作業 AI 鑑識工具
 
+[![Deploy to GitHub Pages](https://github.com/eathainliao/AI-GLASS/actions/workflows/deploy.yml/badge.svg)](https://github.com/eathainliao/AI-GLASS/actions/workflows/deploy.yml)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-online-brightgreen)](https://eathainliao.github.io/AI-GLASS/)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
+
 幫助教師快速批閱全班作業，自動標記疑似 AI 生成句型（紅色）與已知事實引用（藍色）。
+
+## 🚀 線上使用
+
+**👉 https://eathainliao.github.io/AI-GLASS/**
+
+免安裝，開啟即用 —— 準備好 Gemini API Key（見下方），貼入網頁即可開始批閱。
 
 ## 取得 Gemini API Key（免費，約 30 秒）
 
