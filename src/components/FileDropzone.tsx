@@ -56,7 +56,12 @@ export function FileDropzone({ onAnalyze, disabled }: Props) {
             : 'border-gray-300 bg-gray-50 hover:border-indigo-300 hover:bg-indigo-50/40'
         }`}
       >
-        <span className="text-3xl">📂</span>
+        <span
+          className="text-3xl transition-transform duration-150 ease-out"
+          style={{ transform: dragging ? 'scale(1.08)' : 'scale(1)' }}
+        >
+          📂
+        </span>
         <p className="mt-2 text-sm font-medium text-gray-600">點擊選檔，或拖放作業至此</p>
         <p className="mt-1 text-xs text-gray-400">支援 DOCX、PDF、TXT、JPG/PNG（手寫圖片）</p>
         <input
@@ -83,7 +88,10 @@ export function FileDropzone({ onAnalyze, disabled }: Props) {
           </div>
           <ul className="max-h-48 divide-y divide-gray-50 overflow-y-auto">
             {files.map((f) => (
-              <li key={f.name} className="animate-enter flex items-center justify-between px-4 py-2">
+              <li
+                key={f.name}
+                className="animate-enter flex items-center justify-between px-4 py-2"
+              >
                 <span className="flex items-center gap-2 text-sm text-gray-700">
                   <span>{fileIcon(f)}</span>
                   <span className="max-w-xs truncate">{f.name}</span>

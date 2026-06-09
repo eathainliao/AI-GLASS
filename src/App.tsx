@@ -5,6 +5,7 @@ import { useAnalysisStore } from './store/analysisStore'
 import { useAnnotationStore, type AnnotationStatus } from './store/annotationStore'
 import { AppIntro } from './components/AppIntro'
 import { OnboardingGuide } from './components/OnboardingGuide'
+import { Spinner } from './components/Spinner'
 import { ApiKeyInput } from './components/ApiKeyInput'
 import { FileDropzone } from './components/FileDropzone'
 import { ProgressBar } from './components/ProgressBar'
@@ -96,7 +97,8 @@ function App() {
   const filtered = sorted
     .filter((r) => r.suspectRatio >= ratioMin)
     .filter(
-      (r) => statusFilter === 'all' || (annotations[r.filename]?.status ?? 'pending') === statusFilter
+      (r) =>
+        statusFilter === 'all' || (annotations[r.filename]?.status ?? 'pending') === statusFilter
     )
     .filter((r) => r.filename.toLowerCase().includes(search.trim().toLowerCase()))
 
@@ -154,7 +156,10 @@ function App() {
 
             {status === 'analyzing' && (
               <div className="animate-enter rounded-xl border border-indigo-100 bg-white p-6 print:hidden">
-                <p className="mb-4 text-sm font-medium text-gray-700">正在分析中，請稍候...</p>
+                <p className="mb-4 flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <Spinner className="text-indigo-500" />
+                  正在分析中，請稍候...
+                </p>
                 <ProgressBar completed={progress.completed} total={progress.total} />
                 <p className="mt-3 text-xs text-gray-400">
                   依 Gemini 免費限速（10 次/分鐘），{progress.total} 份約需{' '}

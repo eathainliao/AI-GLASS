@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { pingGemini } from '../lib/gemini/client'
+import { Spinner } from './Spinner'
 
 interface Props {
   currentKey: string | null
-  onSave: (key: string) => Promise<void>       // persist to localStorage
-  onSaveSession: (key: string) => void          // state only, clears on refresh
+  onSave: (key: string) => Promise<void> // persist to localStorage
+  onSaveSession: (key: string) => void // state only, clears on refresh
   onClear: () => void
 }
 
@@ -73,8 +74,9 @@ export function ApiKeyInput({ currentKey, onSave, onSaveSession, onClear }: Prop
         <button
           onClick={handleTestAndSave}
           disabled={testing || !input.trim()}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition ease-out duration-150 hover:bg-indigo-700 active:scale-[0.97] disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition ease-out duration-150 hover:bg-indigo-700 active:scale-[0.97] disabled:opacity-50"
         >
+          {testing && <Spinner />}
           {testing ? '測試中...' : '測試並儲存'}
         </button>
       </div>
